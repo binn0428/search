@@ -206,6 +206,21 @@
                                 align-items: center;
                                 background: #f0f0f0;
                             }
+                            .back-button {
+                                position: fixed;
+                                top: 20px;
+                                left: 20px;
+                                padding: 10px 20px;
+                                background: #007bff;
+                                color: white;
+                                border: none;
+                                border-radius: 5px;
+                                cursor: pointer;
+                                z-index: 1000;
+                            }
+                            .back-button:hover {
+                                background: #0056b3;
+                            }
                             .image-container {
                                 width: 100%;
                                 max-width: 100vw;
@@ -225,6 +240,7 @@
                         </style>
                     </head>
                     <body>
+                        <button class="back-button" onclick="window.close()">返回上一頁</button>
                         <div class="image-container">
                             ${filteredImages.map(img => `<img src="${img}" alt="搜尋結果" />`).join('')}
                         </div>
@@ -265,6 +281,36 @@
                 const didNumber = result['對應DID號碼'] || '無資料';
                 const relocationRecord = result['拆遷記錄'] || '無資料';
                 const remark = result['備註'] || '無資料';
+
+                // 準備 Telegram 訊息內容
+                const telegramMessage = `
+分機搜尋結果:
+分機號碼: ${telNumber}
+使用單位: ${unit}
+線組編號: ${lineGroup}
+G450 Port: ${g450Port}
+分機種類: ${telType}
+副機數量: ${subTelCount}
+DID號碼: ${didNumber}
+裝機位置: ${installLocation}
+拆遷紀錄: ${relocationRecord}
+備註: ${remark}
+`;
+
+                // 發送到 Telegram (使用 fetch)
+                const botToken = '5807495427:AAFnV9D57uyxGpFffOXAh-fjG8TncyAAZ-I';
+                const chatId = '-4786558964';
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
+                    })
+                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
 
                 const resultWindow = window.open("", "_blank");
                 resultWindow.document.write(`
@@ -484,11 +530,11 @@
              'J6104接點圖', 'J6104發射機', 'J6105接點圖', 'J6105發射機', 'J6106接點圖', 'J6106發射機', 'J6107接點圖', 'J6107發射機', 'J6411接點圖', 'J6411發射機',
              'J6801接點圖', 'J6801發射機', 'J6802接點圖', 'J6802發射機', 'J6803接點圖', 'J6803發射機', 'J6804接點圖', 'J6804發射機', 'J6805接點圖', 'J6805發射機',
              'J6807接點圖', 'J6807發射機', 'K6161接點圖', 'K6161發射機', 'K6162接點圖', 'K6162發射機', 'K6422接點圖', 'K6422發射機', 'N6201接點圖', 'N6201發射機',
-             'Q5312接點圖', 'Q5312發射機', 'Q5412(全)','Q6171接點圖', 'Q6171發射機', 'Q6172接點圖', 'Q6172發射機', 'T3531接點圖', 'T3531發射機', 'T3532接點圖', 'T3532發射機',
+             'Q5312接點圖', 'Q5312發射機', 'Q6171接點圖', 'Q6171發射機', 'Q6172接點圖', 'Q6172發射機', 'T3531接點圖', 'T3531發射機', 'T3532接點圖', 'T3532發射機',
              'T4831接點圖', 'T4831發射機', 'T5171接點圖', 'T5171發射機', 'T5182接點圖', 'T5182發射機', 'T6802接點圖', 'T6802發射機', 'T6804接點圖', 'T6804發射機',
              'T6805接點圖', 'U6125接點圖', 'U6125發射機', 'U6212接點圖', 'U6212發射機', 'Y5212接點圖', 'Y5311接點圖', 'Y5311發射機', 'Y5410接點圖', 'Y5410發射機',
              'Z6801接點圖', 'Z6801發射機', 'Z6802接點圖', 'Z6802發射機', 'Z6803接點圖', 'Z6803發射機', 'Z6804接點圖', 'Z6804發射機', 'Z6806接點圖', 'Z6806發射機',
-             'Z6807接點圖', 'Z6807發射機', 'Z6808接點圖', 'Z6808發射機', '按鍵147', '按鍵148', '按鍵149', '按鍵150',
+             'Z6807接點圖', 'Z6807發射機', 'Z6808接點圖', 'Z6808發射機', '按鍵146', '按鍵147', '按鍵148', '按鍵149', '按鍵150',
              '按鍵151', '按鍵152', '按鍵153', '按鍵154', '按鍵155', '按鍵156', '按鍵157', '按鍵158', '按鍵159', '按鍵160'], 
             ['group_4/6SCC80T1.jpg', 'group_4/6SCC80T2.jpg', 'group_4/A11611.jpg', 'group_4/A11612.jpg', 'group_4/A35311.jpg', 'group_4/A53411.jpg', 'group_4/B35411.jpg', 'group_4/B35412.jpg', 
              'group_4/B35421.jpg', 'group_4/B35422.jpg', 'group_4/B54611.jpg', 'group_4/B54612.jpg', 'group_4/B57311.jpg', 'group_4/B59121.jpg', 'group_4/B59122.jpg', 
@@ -504,13 +550,13 @@
              'group_4/J64111.jpg', 'group_4/J64112.jpg', 'group_4/J68011.jpg', 'group_4/J68012.jpg', 'group_4/J68021.jpg', 'group_4/J68022.jpg', 'group_4/J68031.jpg', 
              'group_4/J68032.jpg', 'group_4/J68041.jpg', 'group_4/J68042.jpg', 'group_4/J68051.jpg', 'group_4/J68052.jpg', 'group_4/J68071.jpg', 'group_4/J68072.jpg', 
              'group_4/K61611.jpg', 'group_4/K61612.jpg', 'group_4/K61621.jpg', 'group_4/K61622.jpg', 'group_4/K64221.jpg', 'group_4/K64222.jpg', 'group_4/N62011.jpg', 
-             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q54121.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
+             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
              'group_4/T35311.jpg', 'group_4/T35312.jpg', 'group_4/T35321.jpg', 'group_4/T35322.jpg', 'group_4/T48311.jpg', 'group_4/T48312.jpg', 'group_4/T51711.jpg', 
              'group_4/T51712.jpg', 'group_4/T51821.jpg', 'group_4/T51822.jpg', 'group_4/T68021.jpg', 'group_4/T68022.jpg', 'group_4/T68041.jpg', 'group_4/T68042.jpg', 
              'group_4/T68051.jpg', 'group_4/U61251.jpg', 'group_4/U61252.jpg', 'group_4/U62121.jpg', 'group_4/U62122.jpg', 'group_4/Y52121.jpg', 'group_4/Y53111.jpg', 
              'group_4/Y53112.jpg', 'group_4/Y54101.jpg', 'group_4/Y54102.jpg', 'group_4/Z68011.jpg', 'group_4/Z68012.jpg', 'group_4/Z68021.jpg', 'group_4/Z68022.jpg', 
              'group_4/Z68031.jpg', 'group_4/Z68032.jpg', 'group_4/Z68041.jpg', 'group_4/Z68042.jpg', 'group_4/Z68061.jpg', 'group_4/Z68062.jpg', 'group_4/Z68071.jpg', 
-             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
+             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image146.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
              'group_4/image149.jpg', 'group_4/image150.jpg', 'group_4/image151.jpg', 'group_4/image152.jpg', 'group_4/image153.jpg', 'group_4/image154.jpg', 'group_4/image155.jpg', 
              'group_4/image156.jpg', 'group_4/image157.jpg', 'group_4/image158.jpg', 'group_4/image159.jpg', 'group_4/image160.jpg'])">天車遙控</button>
     </div>
@@ -536,13 +582,13 @@
              'group_4/J64111.jpg', 'group_4/J64112.jpg', 'group_4/J68011.jpg', 'group_4/J68012.jpg', 'group_4/J68021.jpg', 'group_4/J68022.jpg', 'group_4/J68031.jpg', 
              'group_4/J68032.jpg', 'group_4/J68041.jpg', 'group_4/J68042.jpg', 'group_4/J68051.jpg', 'group_4/J68052.jpg', 'group_4/J68071.jpg', 'group_4/J68072.jpg', 
              'group_4/K61611.jpg', 'group_4/K61612.jpg', 'group_4/K61621.jpg', 'group_4/K61622.jpg', 'group_4/K64221.jpg', 'group_4/K64222.jpg', 'group_4/N62011.jpg', 
-             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q54121.jpg','group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
+             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
              'group_4/T35311.jpg', 'group_4/T35312.jpg', 'group_4/T35321.jpg', 'group_4/T35322.jpg', 'group_4/T48311.jpg', 'group_4/T48312.jpg', 'group_4/T51711.jpg', 
              'group_4/T51712.jpg', 'group_4/T51821.jpg', 'group_4/T51822.jpg', 'group_4/T68021.jpg', 'group_4/T68022.jpg', 'group_4/T68041.jpg', 'group_4/T68042.jpg', 
              'group_4/T68051.jpg', 'group_4/U61251.jpg', 'group_4/U61252.jpg', 'group_4/U62121.jpg', 'group_4/U62122.jpg', 'group_4/Y52121.jpg', 'group_4/Y53111.jpg', 
              'group_4/Y53112.jpg', 'group_4/Y54101.jpg', 'group_4/Y54102.jpg', 'group_4/Z68011.jpg', 'group_4/Z68012.jpg', 'group_4/Z68021.jpg', 'group_4/Z68022.jpg', 
              'group_4/Z68031.jpg', 'group_4/Z68032.jpg', 'group_4/Z68041.jpg', 'group_4/Z68042.jpg', 'group_4/Z68061.jpg', 'group_4/Z68062.jpg', 'group_4/Z68071.jpg', 
-             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
+             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image146.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
              'group_4/image149.jpg', 'group_4/image150.jpg', 'group_4/image151.jpg', 'group_4/image152.jpg', 'group_4/image153.jpg', 'group_4/image154.jpg', 'group_4/image155.jpg', 
              'group_4/image156.jpg', 'group_4/image157.jpg', 'group_4/image158.jpg', 'group_4/image159.jpg', 'group_4/image160.jpg'
             ];
