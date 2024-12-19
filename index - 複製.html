@@ -87,10 +87,11 @@
                             flex-wrap: wrap;
                             justify-content: center;
                             align-items: center;
-                            height: 100vh;
+                            min-height: 100vh;
                             margin: 0;
+                            padding: 20px;
                             font-family: Arial, sans-serif;
-                            
+                            box-sizing: border-box;
                         }
                         .option {
                             width: 100px;
@@ -102,17 +103,38 @@
                             margin: 5px;
                             font-size: 18px;
                             cursor: pointer;
-                            background-color: rgba(57, 255, 20, 0.8); /* 綠底 */
-                            color: black; /* 黑字 */
-                            transition: all 0.3s ease; /* 添加過渡效果 */
-                            box-shadow: 0 5px #666; /* 添加立體感 */
-                            outline: none; /* 移除按壓時的藍色輪廓 */
+                            background-color: rgba(57, 255, 20, 0.8);
+                            color: black;
+                            transition: all 0.3s ease;
+                            box-shadow: 0 5px #666;
+                            outline: none;
+                        }
+                        .option:hover {
+                            background-color: rgba(57, 255, 20, 1);
+                        }
+                        /* 新增圖片顯示視窗的樣式 */
+                        .image-window {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: white;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 1000;
+                        }
+                        .image-window img {
+                            max-width: 100%;
+                            max-height: 100%;
+                            object-fit: contain;
                         }
                     </style>
                 </head>
                 <body>
-                    ${Array.from({ length: 160 }, (_, i) => `
-                        <div class="option" onclick="window.open('${imagePaths[i]}', '_blank')">
+                    ${Array.from({ length: buttonNames.length }, (_, i) => `
+                        <div class="option" onclick="window.open('${imagePaths[i]}', '_blank', 'width=800,height=600').document.write('<html><head><style>body{margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:white;}img{max-width:100%;max-height:100vh;object-fit:contain;}</style></head><body><img src=\\'${imagePaths[i]}\\' /></body></html>')">
                             ${buttonNames[i]}
                         </div>
                     `).join('')}
@@ -166,7 +188,7 @@
             ];
             const filteredImages = images.filter(image => image.toLowerCase().includes(input));
             if (filteredImages.length > 0) {
-                const newWindow = window.open("", "_blank", "noopener,noreferrer");
+                const newWindow = window.open("", "_blank");
                 newWindow.document.write(`
                     <!DOCTYPE html>
                     <html lang="zh-Hant">
@@ -174,9 +196,38 @@
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>搜尋結果</title>
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                min-height: 100vh;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                background: #f0f0f0;
+                            }
+                            .image-container {
+                                width: 100%;
+                                max-width: 100vw;
+                                padding: 20px;
+                                box-sizing: border-box;
+                            }
+                            img {
+                                width: 100%;
+                                height: auto;
+                                max-height: 90vh;
+                                object-fit: contain;
+                                display: block;
+                                margin: 10px auto;
+                                background: white;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            }
+                        </style>
                     </head>
                     <body>
-                        ${filteredImages.map(img => `<img src="${img}" style="max-width: 100%; height: auto;" />`).join('')}
+                        <div class="image-container">
+                            ${filteredImages.map(img => `<img src="${img}" alt="搜尋結果" />`).join('')}
+                        </div>
                     </body>
                     </html>
                 `);
@@ -198,82 +249,6 @@
 
             const telNumber = parseInt(input);
             const result = telData.find(item =>
-                item['分機號碼'] === telNumber ||
-                item['分機'] === telNumber ||
-                item['Tel'] === telNumber
-            );
-
-            if (result) {
-                const unit = result['使用單位'] || result['單位'] || result['部門'] || '無資料';
-                const lineGroup = result['線組編號'] || '無資料';
-                const telType = result['分機種類'] || '無資料';
-                const subTelCount = result['副機數量'] || '無資料';
-                const installLocation = result['裝機位置'] || '無資料';
-                const g450Port = result['G450 Port'] || '無資料';
-                const telNumber = result['分機號碼'] || result['分機'] || result['Tel'] || input;
-
-                const resultWindow = window.open("", "_blank");
-                resultWindow.document.write(`
-                    <!DOCTYPE html>
-                    <html lang="zh-Hant">
-                    <head>
-                        <meta charset="UTF-8">
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <title>分機搜尋結果</title>
-                        <style>
-                            body {
-                                font-family: Arial, sans-serif;
-                                margin: 0;
-                                padding: 20px;
-                                background-color: #f0f0f0;
-                            }
-                            .result-container {
-                                width: 400px;
-                                margin: 0 auto;
-                                background-color: #fff;
-                                padding: 20px;
-                                border-radius: 5px;
-                                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                            }
-                            .result-item {
-                                margin-bottom: 10px;
-                                text-align: left;
-                            }
-                            .label {
-                                font-weight: bold;
-                                margin-right: 10px;
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="result-container">
-                            <div class="result-item"><span class="label">分機號碼:</span>${telNumber}</div>
-                            <div class="result-item"><span class="label">使用單位:</span>${unit}</div>
-                            <div class="result-item"><span class="label">線組編號:</span>${lineGroup}</div>
-                            <div class="result-item"><span class="label">G450 Port:</span>${g450Port}</div>
-                            <div class="result-item"><span class="label">分機種類:</span>${telType}</div>
-                            <div class="result-item"><span class="label">副機數量:</span>${subTelCount}</div>
-                            <div class="result-item"><span class="label">裝機位置:</span>${installLocation}</div>
-                            
-                        </div>
-                    </body>
-                    </html>
-                `);
-                resultWindow.document.close();
-            } else {
-                alert('未找到符合的分機資料');
-            }
-        }
-         let unitData = null;
-        function searchTel() {
-            const input = document.getElementById('telSearchInput').value.trim();
-            if (input === "") {
-                alert('請輸入分機號碼');
-                return;
-            }
-
-            const telNumber = parseInt(input);
-            const result = unitData.find(item =>
                 item['分機號碼'] === telNumber ||
                 item['分機'] === telNumber ||
                 item['Tel'] === telNumber
@@ -346,24 +321,29 @@
                 alert('未找到符合的分機資料');
             }
         }
-         // 頁面載入時自動讀取分機資料和使用單位資料
-         Promise.all([
-            fetch('./tel/電話資料.xlsx'),
-            fetch('./unit/調度資料.xlsx')
-        ])
-        .then(([telResponse, unitResponse]) => Promise.all([telResponse.arrayBuffer(), unitResponse.arrayBuffer()]))
-        .then(([telDataBuffer, unitDataBuffer]) => {
-            const telWorkbook = XLSX.read(telDataBuffer, { type: 'array' });
-            const unitWorkbook = XLSX.read(unitDataBuffer, { type: 'array' });
-            const telWorksheet = telWorkbook.Sheets[telWorkbook.SheetNames[0]];
-            const unitWorksheet = unitWorkbook.Sheets[unitWorkbook.SheetNames[0]];
-            telData = XLSX.utils.sheet_to_json(telWorksheet);
-            unitData = XLSX.utils.sheet_to_json(unitWorksheet);
-            console.log('分機資料和使用單位資料載入成功', telData, unitData); // 添加日誌
-        })
-        .catch(error => {
-            alert('讀取分機資料或使用單位資料時發生錯誤，請確認檔案位置是否正確');
-            console.error('讀取分機資料或使用單位資料時發生錯誤:', error);
+
+        // 頁面載入時自動讀取分機資料
+        fetch('./tel/電話資料.xlsx')
+            .then(response => response.arrayBuffer())
+            .then(data => {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                telData = XLSX.utils.sheet_to_json(worksheet);
+                console.log('分機資料載入成功', telData); // 添加日誌
+            })
+            .catch(error => {
+                alert('讀取分機資料時發生錯誤，請確認檔案位置是否正確');
+                console.error('讀取分機資料時發生錯誤:', error);
+            });
+
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); // 禁止右鍵菜單
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault(); // 禁止 F12 和 Ctrl+Shift+I
+            }
         });
     </script>
 </head>
@@ -496,7 +476,7 @@
         <button onclick="openNewPage('天車遙控', 
             ['6SCC80T接點圖', '6SCC80T發射機', 'A1161接點圖', 'A1161發射機', 'A3531接點圖', 'A5341接點圖', 'B3541接點圖', 'B3541發射機', 'B3542接點圖', 'B3542發射機', 
              'B5461接點圖', 'B5461發射機', 'B5731(全)', 'B5912接點圖', 'B5912發射機', 'B6211接點圖', 'B6211發射機', 'B6222接點圖', 'B6222發射機', 'C1101接點圖', 
-             'C1101發射機', 'C1171接點圖', 'C1171發射機', 'C1191(全)', 'C3531接點圖', 'C3531發射機', 'C3532接點圖', 'C3532發射機', 'C3561接點圖', 'C3561發射機', 
+             'C1101發射機', 'C1171接點圖', 'C1171發射機', 'C1191接點圖', 'C1191發射機','C3531接點圖', 'C3531發射機', 'C3532接點圖', 'C3532發射機', 'C3561接點圖', 'C3561發射機', 
              'C3571接點圖', 'C3571發射機', 'C5241接點圖', 'C5351接點圖', 'C5351發射機', 'C5471接點圖', 'C5471發射機', 'CSU1接點圖', 'CSU1發射機', 'CSU2接點圖',
              'CSU2發射機', 'D3531接點圖', 'D3531發射機', 'D3532接點圖', 'D3532發射機', 'D5642接點圖', 'D5642發射機', 'E5441接點圖', 'E5441發射機', 'E5451接點圖',
              'E5451發射機', 'F6101接點圖', 'F6101發射機', 'F6102接點圖', 'F6102發射機', 'F6103接點圖', 'F6103發射機', 'H5252接點圖', 'H53511接點圖', 'H5351發射機',
@@ -504,16 +484,16 @@
              'J6104接點圖', 'J6104發射機', 'J6105接點圖', 'J6105發射機', 'J6106接點圖', 'J6106發射機', 'J6107接點圖', 'J6107發射機', 'J6411接點圖', 'J6411發射機',
              'J6801接點圖', 'J6801發射機', 'J6802接點圖', 'J6802發射機', 'J6803接點圖', 'J6803發射機', 'J6804接點圖', 'J6804發射機', 'J6805接點圖', 'J6805發射機',
              'J6807接點圖', 'J6807發射機', 'K6161接點圖', 'K6161發射機', 'K6162接點圖', 'K6162發射機', 'K6422接點圖', 'K6422發射機', 'N6201接點圖', 'N6201發射機',
-             'Q5312接點圖', 'Q5312發射機', 'Q6171接點圖', 'Q6171發射機', 'Q6172接點圖', 'Q6172發射機', 'T3531接點圖', 'T3531發射機', 'T3532接點圖', 'T3532發射機',
+             'Q5312接點圖', 'Q5312發射機', 'Q5412(全)','Q6171接點圖', 'Q6171發射機', 'Q6172接點圖', 'Q6172發射機', 'T3531接點圖', 'T3531發射機', 'T3532接點圖', 'T3532發射機',
              'T4831接點圖', 'T4831發射機', 'T5171接點圖', 'T5171發射機', 'T5182接點圖', 'T5182發射機', 'T6802接點圖', 'T6802發射機', 'T6804接點圖', 'T6804發射機',
              'T6805接點圖', 'U6125接點圖', 'U6125發射機', 'U6212接點圖', 'U6212發射機', 'Y5212接點圖', 'Y5311接點圖', 'Y5311發射機', 'Y5410接點圖', 'Y5410發射機',
              'Z6801接點圖', 'Z6801發射機', 'Z6802接點圖', 'Z6802發射機', 'Z6803接點圖', 'Z6803發射機', 'Z6804接點圖', 'Z6804發射機', 'Z6806接點圖', 'Z6806發射機',
-             'Z6807接點圖', 'Z6807發射機', 'Z6808接點圖', 'Z6808發射機', '按鍵145', '按鍵146', '按鍵147', '按鍵148', '按鍵149', '按鍵150',
+             'Z6807接點圖', 'Z6807發射機', 'Z6808接點圖', 'Z6808發射機', '按鍵147', '按鍵148', '按鍵149', '按鍵150',
              '按鍵151', '按鍵152', '按鍵153', '按鍵154', '按鍵155', '按鍵156', '按鍵157', '按鍵158', '按鍵159', '按鍵160'], 
             ['group_4/6SCC80T1.jpg', 'group_4/6SCC80T2.jpg', 'group_4/A11611.jpg', 'group_4/A11612.jpg', 'group_4/A35311.jpg', 'group_4/A53411.jpg', 'group_4/B35411.jpg', 'group_4/B35412.jpg', 
              'group_4/B35421.jpg', 'group_4/B35422.jpg', 'group_4/B54611.jpg', 'group_4/B54612.jpg', 'group_4/B57311.jpg', 'group_4/B59121.jpg', 'group_4/B59122.jpg', 
              'group_4/B62111.jpg', 'group_4/B62112.jpg', 'group_4/B62221.jpg', 'group_4/B62222.jpg', 'group_4/C11011.jpg', 'group_4/C11012.jpg', 'group_4/C11711.jpg', 
-             'group_4/C11712.jpg', 'group_4/C11911.jpg', 'group_4/C35311.jpg', 'group_4/C35312.jpg', 'group_4/C35321.jpg', 'group_4/C35322.jpg', 'group_4/C35611.jpg', 
+             'group_4/C11712.jpg', 'group_4/C11911.jpg', 'group_4/C11912.jpg','group_4/C35311.jpg', 'group_4/C35312.jpg', 'group_4/C35321.jpg', 'group_4/C35322.jpg', 'group_4/C35611.jpg', 
              'group_4/C35612.jpg', 'group_4/C35711.jpg', 'group_4/C35712.jpg', 'group_4/C52411.jpg', 'group_4/C53511.jpg', 'group_4/C53512.jpg', 'group_4/C54711.jpg', 
              'group_4/C54712.jpg', 'group_4/CSU11.jpg', 'group_4/CSU12.jpg', 'group_4/CSU21.jpg', 'group_4/CSU22.jpg', 'group_4/D35311.jpg', 'group_4/D35312.jpg', 
              'group_4/D35321.jpg', 'group_4/D35322.jpg', 'group_4/D56421.jpg', 'group_4/D56422.jpg', 'group_4/E54411.jpg', 'group_4/E54412.jpg', 'group_4/E54511.jpg', 
@@ -524,13 +504,13 @@
              'group_4/J64111.jpg', 'group_4/J64112.jpg', 'group_4/J68011.jpg', 'group_4/J68012.jpg', 'group_4/J68021.jpg', 'group_4/J68022.jpg', 'group_4/J68031.jpg', 
              'group_4/J68032.jpg', 'group_4/J68041.jpg', 'group_4/J68042.jpg', 'group_4/J68051.jpg', 'group_4/J68052.jpg', 'group_4/J68071.jpg', 'group_4/J68072.jpg', 
              'group_4/K61611.jpg', 'group_4/K61612.jpg', 'group_4/K61621.jpg', 'group_4/K61622.jpg', 'group_4/K64221.jpg', 'group_4/K64222.jpg', 'group_4/N62011.jpg', 
-             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
+             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q54121.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
              'group_4/T35311.jpg', 'group_4/T35312.jpg', 'group_4/T35321.jpg', 'group_4/T35322.jpg', 'group_4/T48311.jpg', 'group_4/T48312.jpg', 'group_4/T51711.jpg', 
              'group_4/T51712.jpg', 'group_4/T51821.jpg', 'group_4/T51822.jpg', 'group_4/T68021.jpg', 'group_4/T68022.jpg', 'group_4/T68041.jpg', 'group_4/T68042.jpg', 
              'group_4/T68051.jpg', 'group_4/U61251.jpg', 'group_4/U61252.jpg', 'group_4/U62121.jpg', 'group_4/U62122.jpg', 'group_4/Y52121.jpg', 'group_4/Y53111.jpg', 
              'group_4/Y53112.jpg', 'group_4/Y54101.jpg', 'group_4/Y54102.jpg', 'group_4/Z68011.jpg', 'group_4/Z68012.jpg', 'group_4/Z68021.jpg', 'group_4/Z68022.jpg', 
              'group_4/Z68031.jpg', 'group_4/Z68032.jpg', 'group_4/Z68041.jpg', 'group_4/Z68042.jpg', 'group_4/Z68061.jpg', 'group_4/Z68062.jpg', 'group_4/Z68071.jpg', 
-             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image145.jpg', 'group_4/image146.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
+             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
              'group_4/image149.jpg', 'group_4/image150.jpg', 'group_4/image151.jpg', 'group_4/image152.jpg', 'group_4/image153.jpg', 'group_4/image154.jpg', 'group_4/image155.jpg', 
              'group_4/image156.jpg', 'group_4/image157.jpg', 'group_4/image158.jpg', 'group_4/image159.jpg', 'group_4/image160.jpg'])">天車遙控</button>
     </div>
@@ -545,7 +525,7 @@
              'group_4/6SCC80T1.jpg', 'group_4/6SCC80T2.jpg', 'group_4/A11611.jpg', 'group_4/A11612.jpg', 'group_4/A35311.jpg', 'group_4/A53411.jpg', 'group_4/B35411.jpg', 'group_4/B35412.jpg', 
              'group_4/B35421.jpg', 'group_4/B35422.jpg', 'group_4/B54611.jpg', 'group_4/B54612.jpg', 'group_4/B57311.jpg', 'group_4/B59121.jpg', 'group_4/B59122.jpg', 
              'group_4/B62111.jpg', 'group_4/B62112.jpg', 'group_4/B62221.jpg', 'group_4/B62222.jpg', 'group_4/C11011.jpg', 'group_4/C11012.jpg', 'group_4/C11711.jpg', 
-             'group_4/C11712.jpg', 'group_4/C11911.jpg', 'group_4/C35311.jpg', 'group_4/C35312.jpg', 'group_4/C35321.jpg', 'group_4/C35322.jpg', 'group_4/C35611.jpg', 
+             'group_4/C11712.jpg', 'group_4/C11911.jpg', 'group_4/C11912.jpg', 'group_4/C35311.jpg', 'group_4/C35312.jpg', 'group_4/C35321.jpg', 'group_4/C35322.jpg', 'group_4/C35611.jpg', 
              'group_4/C35612.jpg', 'group_4/C35711.jpg', 'group_4/C35712.jpg', 'group_4/C52411.jpg', 'group_4/C53511.jpg', 'group_4/C53512.jpg', 'group_4/C54711.jpg', 
              'group_4/C54712.jpg', 'group_4/CSU11.jpg', 'group_4/CSU12.jpg', 'group_4/CSU21.jpg', 'group_4/CSU22.jpg', 'group_4/D35311.jpg', 'group_4/D35312.jpg', 
              'group_4/D35321.jpg', 'group_4/D35322.jpg', 'group_4/D56421.jpg', 'group_4/D56422.jpg', 'group_4/E54411.jpg', 'group_4/E54412.jpg', 'group_4/E54511.jpg', 
@@ -556,13 +536,13 @@
              'group_4/J64111.jpg', 'group_4/J64112.jpg', 'group_4/J68011.jpg', 'group_4/J68012.jpg', 'group_4/J68021.jpg', 'group_4/J68022.jpg', 'group_4/J68031.jpg', 
              'group_4/J68032.jpg', 'group_4/J68041.jpg', 'group_4/J68042.jpg', 'group_4/J68051.jpg', 'group_4/J68052.jpg', 'group_4/J68071.jpg', 'group_4/J68072.jpg', 
              'group_4/K61611.jpg', 'group_4/K61612.jpg', 'group_4/K61621.jpg', 'group_4/K61622.jpg', 'group_4/K64221.jpg', 'group_4/K64222.jpg', 'group_4/N62011.jpg', 
-             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
+             'group_4/N62012.jpg', 'group_4/Q53121.jpg', 'group_4/Q53122.jpg', 'group_4/Q54121.jpg','group_4/Q61711.jpg', 'group_4/Q61712.jpg', 'group_4/Q61721.jpg', 'group_4/Q61722.jpg', 
              'group_4/T35311.jpg', 'group_4/T35312.jpg', 'group_4/T35321.jpg', 'group_4/T35322.jpg', 'group_4/T48311.jpg', 'group_4/T48312.jpg', 'group_4/T51711.jpg', 
              'group_4/T51712.jpg', 'group_4/T51821.jpg', 'group_4/T51822.jpg', 'group_4/T68021.jpg', 'group_4/T68022.jpg', 'group_4/T68041.jpg', 'group_4/T68042.jpg', 
              'group_4/T68051.jpg', 'group_4/U61251.jpg', 'group_4/U61252.jpg', 'group_4/U62121.jpg', 'group_4/U62122.jpg', 'group_4/Y52121.jpg', 'group_4/Y53111.jpg', 
              'group_4/Y53112.jpg', 'group_4/Y54101.jpg', 'group_4/Y54102.jpg', 'group_4/Z68011.jpg', 'group_4/Z68012.jpg', 'group_4/Z68021.jpg', 'group_4/Z68022.jpg', 
              'group_4/Z68031.jpg', 'group_4/Z68032.jpg', 'group_4/Z68041.jpg', 'group_4/Z68042.jpg', 'group_4/Z68061.jpg', 'group_4/Z68062.jpg', 'group_4/Z68071.jpg', 
-             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image145.jpg', 'group_4/image146.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
+             'group_4/Z68072.jpg', 'group_4/Z68081.jpg', 'group_4/Z68082.jpg', 'group_4/image147.jpg', 'group_4/image148.jpg', 
              'group_4/image149.jpg', 'group_4/image150.jpg', 'group_4/image151.jpg', 'group_4/image152.jpg', 'group_4/image153.jpg', 'group_4/image154.jpg', 'group_4/image155.jpg', 
              'group_4/image156.jpg', 'group_4/image157.jpg', 'group_4/image158.jpg', 'group_4/image159.jpg', 'group_4/image160.jpg'
             ];
@@ -576,9 +556,38 @@
                         <meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <title>搜尋結果</title>
+                        <style>
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                min-height: 100vh;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                background: #f0f0f0;
+                            }
+                            .image-container {
+                                width: 100%;
+                                max-width: 100vw;
+                                padding: 20px;
+                                box-sizing: border-box;
+                            }
+                            img {
+                                width: 100%;
+                                height: auto;
+                                max-height: 90vh;
+                                object-fit: contain;
+                                display: block;
+                                margin: 10px auto;
+                                background: white;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            }
+                        </style>
                     </head>
                     <body>
-                        ${filteredImages.map(img => `<img src="${img}" style="max-width: 100%; height: auto;" />`).join('')}
+                        <div class="image-container">
+                            ${filteredImages.map(img => `<img src="${img}" alt="搜尋結果" />`).join('')}
+                        </div>
                     </body>
                     </html>
                 `);
