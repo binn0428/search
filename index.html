@@ -220,9 +220,100 @@
             }
         }
 
-        // 宣告全域變數
+        // 頁面載入時自動讀取分機資料和調度資料
         let telData = null;
-        let dispatchData = null;  // 新增調度資料全域變數
+        let dispatchData = null;
+
+        // 添加載入狀態指示器
+        function showLoadingStatus(message) {
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'loadingStatus';
+            statusDiv.style.position = 'fixed';
+            statusDiv.style.top = '50%';
+            statusDiv.style.left = '50%';
+            statusDiv.style.transform = 'translate(-50%, -50%)';
+            statusDiv.style.padding = '20px';
+            statusDiv.style.background = 'rgba(0, 0, 0, 0.8)';
+            statusDiv.style.color = 'white';
+            statusDiv.style.borderRadius = '5px';
+            statusDiv.style.zIndex = '1000';
+            statusDiv.textContent = message;
+            document.body.appendChild(statusDiv);
+        }
+
+        function removeLoadingStatus() {
+            const statusDiv = document.getElementById('loadingStatus');
+            if (statusDiv) {
+                statusDiv.remove();
+            }
+        }
+
+        // 資料載入函數
+        async function loadData() {
+            showLoadingStatus('正在載入資料...');
+            
+            try {
+                // 同時載入兩個檔案
+                const [telResponse, dispatchResponse] = await Promise.all([
+                    fetch('./tel/電話資料.xlsx'),
+                    fetch('./tel/調度資料.xlsx')
+                ]);
+
+                // 檢查回應狀態
+                if (!telResponse.ok) throw new Error('電話資料載入失敗');
+                if (!dispatchResponse.ok) throw new Error('調度資料載入失敗');
+
+                // 轉換為 ArrayBuffer
+                const [telBuffer, dispatchBuffer] = await Promise.all([
+                    telResponse.arrayBuffer(),
+                    dispatchResponse.arrayBuffer()
+                ]);
+
+                // 處理電話資料
+                const telWorkbook = XLSX.read(telBuffer, { type: 'array' });
+                telData = XLSX.utils.sheet_to_json(telWorkbook.Sheets[telWorkbook.SheetNames[0]]);
+
+                // 處理調度資料
+                const dispatchWorkbook = XLSX.read(dispatchBuffer, { type: 'array' });
+                dispatchData = XLSX.utils.sheet_to_json(dispatchWorkbook.Sheets[dispatchWorkbook.SheetNames[0]]);
+
+                // 將調度資料的數字轉換為字串格式
+                dispatchData = dispatchData.map(item => {
+                    if (item['分機號碼'] !== undefined) {
+                        item['分機號碼'] = item['分機號碼'].toString();
+                    }
+                    return item;
+                });
+
+                console.log('分機資料載入成功', telData);
+                console.log('調度資料載入成功', dispatchData);
+                
+                // 顯示成功訊息
+                showLoadingStatus('資料載入完成！');
+                setTimeout(removeLoadingStatus, 1500);
+
+                // 啟用搜尋按鈕
+                document.querySelectorAll('button').forEach(button => {
+                    button.disabled = false;
+                });
+
+            } catch (error) {
+                console.error('資料載入錯誤:', error);
+                showLoadingStatus('資料載入失敗，請重新整理頁面');
+                setTimeout(removeLoadingStatus, 3000);
+            }
+        }
+
+        // 頁面載入時執行
+        window.addEventListener('DOMContentLoaded', () => {
+            // 初始時禁用搜尋按鈕
+            document.querySelectorAll('button').forEach(button => {
+                button.disabled = true;
+            });
+            
+            // 載入資料
+            loadData();
+        });
 
         function searchTel() {
             const input = document.getElementById('telSearchInput').value.trim();
@@ -492,43 +583,6 @@ LENS: ${lens}
                 alert('未找到符合的調度電話資料');
             }
         }
-
-        // 頁面載入時自動讀取分機資料和調度資料
-        // 讀取分機資料
-        fetch('./tel/電話資料.xlsx')
-            .then(response => response.arrayBuffer())
-            .then(buffer => {
-                const telWorkbook = XLSX.read(buffer, { type: 'array' });
-                const telWorksheet = telWorkbook.Sheets[telWorkbook.SheetNames[0]];
-                telData = XLSX.utils.sheet_to_json(telWorksheet);
-                console.log('分機資料載入成功', telData);
-            })
-            .catch(error => {
-                console.error('讀取分機資料時發生錯誤:', error);
-                alert('讀取分機資料時發生錯誤，請確認檔案位置是否正確');
-            });
-
-        // 讀取調度資料
-        fetch('./tel/調度資料.xlsx')
-            .then(response => response.arrayBuffer())
-            .then(buffer => {
-                const dispatchWorkbook = XLSX.read(buffer, { type: 'array' });
-                const dispatchWorksheet = dispatchWorkbook.Sheets[dispatchWorkbook.SheetNames[0]];
-                dispatchData = XLSX.utils.sheet_to_json(dispatchWorksheet);
-                console.log('調度資料載入成功', dispatchData);
-
-                // 將數字轉換為字串格式
-                dispatchData = dispatchData.map(item => {
-                    if (item['分機號碼'] !== undefined) {
-                        item['分機號碼'] = item['分機號碼'].toString();
-                    }
-                    return item;
-                });
-            })
-            .catch(error => {
-                console.error('讀取調度資料時發生錯誤:', error);
-                alert('讀取調度資料時發生錯誤，請確認檔案位置是否正確');
-            });
 
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault(); // 禁止右鍵菜單
