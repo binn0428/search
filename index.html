@@ -343,10 +343,15 @@ DID號碼: ${didNumber}
                 return;
             }
 
-            const dispatchNumber = parseInt(input);
-            const result = dispatchData.find(item =>
-                item['分機號碼'] === dispatchNumber
-            );
+            console.log('搜尋輸入值:', input);
+            console.log('調度資料:', dispatchData);
+
+            // 不轉換為數字，直接用字串比對
+            const result = dispatchData.find(item => {
+                const itemNumber = item['分機號碼'] ? item['分機號碼'].toString() : '';
+                console.log('比對:', itemNumber, input, itemNumber === input);
+                return itemNumber === input;
+            });
 
             if (result) {
                 const telNumber = result['分機號碼'] || '無資料';
@@ -465,9 +470,17 @@ LENS: ${lens}
             const dispatchWorksheet = dispatchWorkbook.Sheets[dispatchWorkbook.SheetNames[0]];
             dispatchData = XLSX.utils.sheet_to_json(dispatchWorksheet);
             console.log('調度資料載入成功', dispatchData);
+
+            // 將數字轉換為字串格式
+            dispatchData = dispatchData.map(item => {
+                if (item['分機號碼'] !== undefined) {
+                    item['分機號碼'] = item['分機號碼'].toString();
+                }
+                return item;
+            });
         }).catch(error => {
-            alert('讀取資料時發生錯誤，請確認檔案位置是否正確');
             console.error('讀取資料時發生錯誤:', error);
+            alert('讀取資料時發生錯誤，請確認檔案位置是否正確');
         });
 
         document.addEventListener('contextmenu', function(e) {
