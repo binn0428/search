@@ -345,17 +345,19 @@ DID號碼: ${didNumber}
 
             const dispatchNumber = parseInt(input);
             const result = dispatchData.find(item =>
-                item['分機號碼'] === dispatchNumber
+                item['分機號碼'] === dispatchNumber ||
+                item['分機'] === dispatchNumber ||
+                item['Tel'] === dispatchNumber
             );
 
             if (result) {
                 const unit = result['使用單位'] || '無資料';
                 const lens = result['LENS'] || '無資料';
                 const lineGroupCurrent = result['線組編號(現場)'] || '無資料';
-                const lineGroupControl = result['線組編號(現場)'] || '無資料';
+                const lineGroupControl = result['線組編號(控制室)'] || '無資料';
                 const location = result['裝機位置'] || '無資料';
                 const subCount = result['副機數量'] || '無資料';
-                const telNumber = result['分機號碼'] || input;
+                const telNumber = result['分機號碼'] || result['分機'] || result['Tel'] || input;
 
                 // 準備 Telegram 訊息內容
                 const telegramMessage = `
