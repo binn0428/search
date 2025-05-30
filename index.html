@@ -226,6 +226,7 @@
 
         // 添加載入狀態指示器
         function showLoadingStatus(message) {
+            removeLoadingStatus(); // 先移除可能存在的狀態提示
             const statusDiv = document.createElement('div');
             statusDiv.id = 'loadingStatus';
             statusDiv.style.position = 'fixed';
@@ -243,16 +244,16 @@
 
         function removeLoadingStatus() {
             const statusDiv = document.getElementById('loadingStatus');
-            if (statusDiv) {
-                statusDiv.remove();
+            if (statusDiv && statusDiv.parentNode) {
+                statusDiv.parentNode.removeChild(statusDiv);
             }
         }
 
         // 資料載入函數
         async function loadData() {
-            showLoadingStatus('正在載入資料...');
-            
             try {
+                showLoadingStatus('正在載入資料...');
+                
                 // 同時載入兩個檔案
                 const [telResponse, dispatchResponse] = await Promise.all([
                     fetch('./tel/電話資料.xlsx'),
@@ -285,26 +286,25 @@
                     return item;
                 });
 
-                console.log('分機資料載入成功', telData);
-                console.log('調度資料載入成功', dispatchData);
-                
-                // 顯示成功訊息並確保移除
-                showLoadingStatus('資料載入完成！');
-                setTimeout(() => {
-                    removeLoadingStatus();
-                }, 1500);
-
                 // 啟用搜尋按鈕
                 document.querySelectorAll('button').forEach(button => {
                     button.disabled = false;
                 });
 
+                // 顯示成功訊息
+                showLoadingStatus('資料載入完成！');
+                
+                // 使用 Promise 確保延遲執行
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                removeLoadingStatus();
+
             } catch (error) {
                 console.error('資料載入錯誤:', error);
                 showLoadingStatus('資料載入失敗，請重新整理頁面');
-                setTimeout(() => {
-                    removeLoadingStatus();
-                }, 3000);
+                
+                // 使用 Promise 確保延遲執行
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                removeLoadingStatus();
             }
         }
 
