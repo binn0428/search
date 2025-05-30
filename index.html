@@ -288,9 +288,11 @@
                 console.log('分機資料載入成功', telData);
                 console.log('調度資料載入成功', dispatchData);
                 
-                // 顯示成功訊息
+                // 顯示成功訊息並確保移除
                 showLoadingStatus('資料載入完成！');
-                setTimeout(removeLoadingStatus, 1500);
+                setTimeout(() => {
+                    removeLoadingStatus();
+                }, 1500);
 
                 // 啟用搜尋按鈕
                 document.querySelectorAll('button').forEach(button => {
@@ -300,7 +302,9 @@
             } catch (error) {
                 console.error('資料載入錯誤:', error);
                 showLoadingStatus('資料載入失敗，請重新整理頁面');
-                setTimeout(removeLoadingStatus, 3000);
+                setTimeout(() => {
+                    removeLoadingStatus();
+                }, 3000);
             }
         }
 
@@ -434,18 +438,13 @@ DID號碼: ${didNumber}
                 return;
             }
 
-            // 檢查是否已成功載入資料
             if (!dispatchData || dispatchData.length === 0) {
                 alert('調度資料尚未載入完成，請稍後再試');
                 return;
             }
 
-            console.log('搜尋輸入值:', input);
-            console.log('調度資料:', dispatchData);
-
             const searchNumber = input;
             const result = dispatchData.find(item => {
-                // 將所有可能的欄位值轉換為字串進行比對
                 const itemNumber = item['分機號碼']?.toString() || '';
                 const itemTel = item['Tel']?.toString() || '';
                 const itemExt = item['分機']?.toString() || '';
@@ -456,45 +455,6 @@ DID號碼: ${didNumber}
             });
 
             if (result) {
-                const telNumber = result['分機號碼']?.toString() || '無資料';
-                const location = result['C端子位置'] || '無資料';
-                const lens = result['LENS'] || '無資料';
-                const lineGroupCurrent = result['線組編號(機房)'] || '無資料';
-                const lineGroupControl = result['線組編號(現場)'] || '無資料';
-                const unit = result['使用單位'] || '無資料';
-                const installLocation = result['裝機位置'] || '無資料';
-                const subCount = result['副機數量'] || '無資料';
-                const directPhone = result['連絡電話'] || '無資料';
-
-                // 準備 Telegram 訊息內容
-                const telegramMessage = `
-調度電話搜尋結果:
-分機號碼: ${telNumber}
-C端子位置: ${location}
-LENS: ${lens}
-線組編號(機房): ${lineGroupCurrent}
-線組編號(現場): ${lineGroupControl}
-使用單位: ${unit}
-裝機位置: ${installLocation}
-副機數量: ${subCount}
-連絡電話: ${directPhone}
-`;
-
-                // 發送到 Telegram
-                const botToken = '5615970654:AAEiOd-m4fmQkps70wkZlvcwLvguk12FLNk';
-                const chatId = '-677659610';
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: telegramMessage,
-                        parse_mode: 'HTML'
-                    })
-                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
-
                 const resultWindow = window.open("", "_blank");
                 resultWindow.document.write(`
                     <!DOCTYPE html>
@@ -517,62 +477,72 @@ LENS: ${lens}
                                 padding: 20px;
                                 border-radius: 5px;
                                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                                width: 400px;
+                                width: 100%;
+                                max-width: 600px;
                             }
                             .result-item {
-                                margin-bottom: 15px;
-                                padding: 12px;
+                                display: flex;
+                                padding: 10px;
                                 border-bottom: 1px solid #eee;
+                                align-items: center;
                             }
                             .label {
                                 font-weight: bold;
                                 color: #333;
-                                display: inline-block;
-                                width: 120px;
-                                margin-right: 10px;
+                                width: 150px;
+                                flex-shrink: 0;
                             }
                             .value {
                                 color: #666;
+                                flex-grow: 1;
+                            }
+                            .title {
+                                text-align: center;
+                                margin-bottom: 20px;
+                                font-size: 1.2em;
+                                color: #333;
+                                font-weight: bold;
                             }
                         </style>
                     </head>
                     <body>
                         <div class="result-container">
+                            <div class="title">調度電話資料</div>
                             <div class="result-item">
-                                <span class="label">分機號碼:</span>
-                                <span class="value">${telNumber}</span>
+                                <span class="label">分機號碼：</span>
+                                <span class="value">${result['分機號碼'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">C端子位置:</span>
-                                <span class="value">${location}</span>
+                                <span class="label">C端子位置：</span>
+                                <span class="value">${result['C端子位置'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">LENS:</span>
-                                <span class="value">${lens}</span>
+                                <span class="label">LENS：</span>
+                                <span class="value">${result['LENS'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">線組編號(機房):</span>
-                                <span class="value">${lineGroupCurrent}</span>
+                                <span class="label">線組編號(機房)：</span>
+                                <span class="value">${result['線組編號(機房)'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">線組編號(現場):</span>
-                                <span class="value">${lineGroupControl}</span>
+                                <span class="label">線組編號(現場)：</span>
+                                <span class="value">${result['線組編號(現場)'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">使用單位:</span>
-                                <span class="value">${unit}</span>
+                                <span class="label">使用單位：</span>
+                                <span class="value">${result['使用單位'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">裝機位置:</span>
-                                <span class="value">${installLocation}</span>
+                                <span class="label">裝機位置：</span>
+                                <span class="value">${result['裝機位置'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">副機數量:</span>
-                                <span class="value">${subCount}</span>
+                                <span class="label">副機數量：</span>
+                                <span class="value">${result['副機數量'] || '無資料'}</span>
                             </div>
                             <div class="result-item">
-                                <span class="label">連絡電話:</span>
-                                <span class="value">${directPhone}</span>
+                                <span class="label">連絡電話：</span>
+                                <span class="value">${result['連絡電話'] || '無資料'}</span>
                             </div>
                         </div>
                     </body>
