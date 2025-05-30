@@ -343,18 +343,29 @@ DID號碼: ${didNumber}
                 return;
             }
 
+            // 檢查是否已成功載入資料
+            if (!dispatchData || dispatchData.length === 0) {
+                alert('調度資料尚未載入完成，請稍後再試');
+                return;
+            }
+
             console.log('搜尋輸入值:', input);
             console.log('調度資料:', dispatchData);
 
-            // 不轉換為數字，直接用字串比對
+            const searchNumber = input;
             const result = dispatchData.find(item => {
-                const itemNumber = item['分機號碼'] ? item['分機號碼'].toString() : '';
-                console.log('比對:', itemNumber, input, itemNumber === input);
-                return itemNumber === input;
+                // 將所有可能的欄位值轉換為字串進行比對
+                const itemNumber = item['分機號碼']?.toString() || '';
+                const itemTel = item['Tel']?.toString() || '';
+                const itemExt = item['分機']?.toString() || '';
+                
+                return itemNumber === searchNumber || 
+                       itemTel === searchNumber || 
+                       itemExt === searchNumber;
             });
 
             if (result) {
-                const telNumber = result['分機號碼'] || '無資料';
+                const telNumber = result['分機號碼']?.toString() || '無資料';
                 const location = result['C端子位置'] || '無資料';
                 const lens = result['LENS'] || '無資料';
                 const lineGroupCurrent = result['線組編號(機房)'] || '無資料';
