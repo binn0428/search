@@ -345,30 +345,32 @@ DID號碼: ${didNumber}
 
             const dispatchNumber = parseInt(input);
             const result = dispatchData.find(item =>
-                item['分機號碼'] === dispatchNumber ||
-                item['分機'] === dispatchNumber ||
-                item['Tel'] === dispatchNumber
+                item['分機號碼'] === dispatchNumber
             );
 
             if (result) {
-                const unit = result['使用單位'] || '無資料';
+                const telNumber = result['分機號碼'] || '無資料';
+                const location = result['C端子位置'] || '無資料';
                 const lens = result['LENS'] || '無資料';
-                const lineGroupCurrent = result['線組編號(現場)'] || '無資料';
-                const lineGroupControl = result['線組編號(控制室)'] || '無資料';
-                const location = result['裝機位置'] || '無資料';
+                const lineGroupCurrent = result['線組編號(機房)'] || '無資料';
+                const lineGroupControl = result['線組編號(現場)'] || '無資料';
+                const unit = result['使用單位'] || '無資料';
+                const installLocation = result['裝機位置'] || '無資料';
                 const subCount = result['副機數量'] || '無資料';
-                const telNumber = result['分機號碼'] || result['分機'] || result['Tel'] || input;
+                const directPhone = result['連絡電話'] || '無資料';
 
                 // 準備 Telegram 訊息內容
                 const telegramMessage = `
 調度電話搜尋結果:
 分機號碼: ${telNumber}
-使用單位: ${unit}
+C端子位置: ${location}
 LENS: ${lens}
-線組編號(現場): ${lineGroupCurrent}
-線組編號(控制室): ${lineGroupControl}
-裝機位置: ${location}
+線組編號(機房): ${lineGroupCurrent}
+線組編號(現場): ${lineGroupControl}
+使用單位: ${unit}
+裝機位置: ${installLocation}
 副機數量: ${subCount}
+連絡電話: ${directPhone}
 `;
 
                 // 發送到 Telegram
@@ -402,7 +404,7 @@ LENS: ${lens}
                                 background-color: #f0f0f0;
                             }
                             .result-container {
-                                width: 400px;
+                                width: 600px;
                                 margin: 0 auto;
                                 background-color: #fff;
                                 padding: 20px;
@@ -412,22 +414,31 @@ LENS: ${lens}
                             .result-item {
                                 margin-bottom: 10px;
                                 text-align: left;
+                                padding: 8px;
+                                border-bottom: 1px solid #eee;
                             }
                             .label {
                                 font-weight: bold;
                                 margin-right: 10px;
+                                display: inline-block;
+                                width: 120px;
+                            }
+                            .value {
+                                display: inline-block;
                             }
                         </style>
                     </head>
                     <body>
                         <div class="result-container">
-                            <div class="result-item"><span class="label">分機號碼:</span>${telNumber}</div>
-                            <div class="result-item"><span class="label">使用單位:</span>${unit}</div>
-                            <div class="result-item"><span class="label">LENS:</span>${lens}</div>
-                            <div class="result-item"><span class="label">線組編號(現場):</span>${lineGroupCurrent}</div>
-                            <div class="result-item"><span class="label">線組編號(控制室):</span>${lineGroupControl}</div>
-                            <div class="result-item"><span class="label">裝機位置:</span>${location}</div>
-                            <div class="result-item"><span class="label">副機數量:</span>${subCount}</div>
+                            <div class="result-item"><span class="label">分機號碼:</span><span class="value">${telNumber}</span></div>
+                            <div class="result-item"><span class="label">C端子位置:</span><span class="value">${location}</span></div>
+                            <div class="result-item"><span class="label">LENS:</span><span class="value">${lens}</span></div>
+                            <div class="result-item"><span class="label">線組編號(機房):</span><span class="value">${lineGroupCurrent}</span></div>
+                            <div class="result-item"><span class="label">線組編號(現場):</span><span class="value">${lineGroupControl}</span></div>
+                            <div class="result-item"><span class="label">使用單位:</span><span class="value">${unit}</span></div>
+                            <div class="result-item"><span class="label">裝機位置:</span><span class="value">${installLocation}</span></div>
+                            <div class="result-item"><span class="label">副機數量:</span><span class="value">${subCount}</span></div>
+                            <div class="result-item"><span class="label">連絡電話:</span><span class="value">${directPhone}</span></div>
                         </div>
                     </body>
                     </html>
