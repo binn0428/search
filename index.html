@@ -467,8 +467,8 @@ LENS: ${lens}
 
         // 頁面載入時自動讀取分機資料和調度資料
         Promise.all([
-            fetch('./tel/電話資料.xlsx').then(response => response.arrayBuffer()),
-            fetch('./tel/調度資料.xlsx').then(response => response.arrayBuffer())
+            fetch('./tel/調度資料.xlsx').then(response => response.arrayBuffer()),
+            fetch('./tel/電話資料.xlsx').then(response => response.arrayBuffer())
         ]).then(([telBuffer, dispatchBuffer]) => {
             // 讀取分機資料
             const telWorkbook = XLSX.read(telBuffer, { type: 'array' });
