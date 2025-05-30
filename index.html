@@ -226,18 +226,21 @@
 
         // 添加載入狀態指示器
         function showLoadingStatus(message) {
-            removeLoadingStatus(); // 先移除可能存在的狀態提示
+            removeLoadingStatus();
             const statusDiv = document.createElement('div');
             statusDiv.id = 'loadingStatus';
             statusDiv.style.position = 'fixed';
             statusDiv.style.top = '50%';
             statusDiv.style.left = '50%';
             statusDiv.style.transform = 'translate(-50%, -50%)';
-            statusDiv.style.padding = '20px';
-            statusDiv.style.background = 'rgba(0, 0, 0, 0.8)';
+            statusDiv.style.padding = '15px 30px';
+            statusDiv.style.background = message.includes('完成') ? 'rgba(40, 167, 69, 0.9)' : 'rgba(0, 0, 0, 0.8)';
             statusDiv.style.color = 'white';
-            statusDiv.style.borderRadius = '5px';
+            statusDiv.style.borderRadius = '4px';
             statusDiv.style.zIndex = '1000';
+            statusDiv.style.fontSize = '16px';
+            statusDiv.style.fontWeight = 'bold';
+            statusDiv.style.transition = 'opacity 0.3s ease';
             statusDiv.textContent = message;
             document.body.appendChild(statusDiv);
         }
@@ -294,16 +297,16 @@
                 // 顯示成功訊息
                 showLoadingStatus('資料載入完成！');
                 
-                // 使用 Promise 確保延遲執行
-                await new Promise(resolve => setTimeout(resolve, 1500));
+                // 縮短顯示時間到 500 毫秒
+                await new Promise(resolve => setTimeout(resolve, 500));
                 removeLoadingStatus();
 
             } catch (error) {
                 console.error('資料載入錯誤:', error);
                 showLoadingStatus('資料載入失敗，請重新整理頁面');
                 
-                // 使用 Promise 確保延遲執行
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                // 縮短錯誤訊息顯示時間到 1000 毫秒
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 removeLoadingStatus();
             }
         }
