@@ -298,7 +298,7 @@
                 showLoadingStatus('資料載入完成！');
                 
                 // 縮短顯示時間到 500 毫秒
-                await new Promise(resolve => setTimeout(resolve, 500));
+                await new Promise(resolve => setTimeout(resolve, 200));
                 removeLoadingStatus();
 
             } catch (error) {
@@ -306,7 +306,7 @@
                 showLoadingStatus('資料載入失敗，請重新整理頁面');
                 
                 // 縮短錯誤訊息顯示時間到 1000 毫秒
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 removeLoadingStatus();
             }
         }
