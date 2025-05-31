@@ -375,7 +375,8 @@ DID號碼: ${didNumber}
                     },
                     body: JSON.stringify({
                         chat_id: chatId,
-                        text: telegramMessage
+                        text: telegramMessage,
+                        parse_mode: 'HTML'
                     })
                 }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
 
@@ -456,35 +457,6 @@ DID號碼: ${didNumber}
             if (results.length > 0) {
                 // 顯示第一個結果
                 const result = results[0];
-
-                // 準備 Telegram 訊息內容
-                const telegramMessage = `
-調度電話搜尋結果:
-分機號碼: ${result['分機號碼'] || '無資料'}
-C端子位置: ${result['C端子位置'] || '無資料'}
-LENS: ${result['LENS'] || '無資料'}
-線組編號(機房): ${result['線組編號(機房)'] || '無資料'}
-線組編號(現場): ${result['線組編號(現場)'] || '無資料'}
-使用單位: ${result['使用單位'] || '無資料'}
-裝機位置: ${result['裝機位置'] || '無資料'}
-副機數量: ${result['副機數量'] || '無資料'}
-連絡電話: ${result['連絡電話'] || '無資料'}
-`;
-
-                // 發送到 Telegram (使用 fetch)
-                const botToken = '5615970654:AAEiOd-m4fmQkps70wkZlvcwLvguk12FLNk';
-                const chatId = '-677659610';
-                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: telegramMessage
-                    })
-                }).catch(error => console.error('發送 Telegram 訊息失敗:', error));
-
                 const resultWindow = window.open("", "_blank");
                 resultWindow.document.write(`
                     <!DOCTYPE html>
