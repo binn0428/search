@@ -325,20 +325,18 @@
         function searchTel() {
             const input = document.getElementById('telSearchInput').value.trim();
             if (input === "") {
-                alert('請輸入搜尋內容');
+                alert('請輸入分機號碼');
                 return;
             }
 
-            const results = telData.filter(item => {
-                return Object.values(item).some(value => {
-                    if (value === null || value === undefined) return false;
-                    return value.toString().toLowerCase().includes(input.toLowerCase());
-                });
-            });
+            const telNumber = parseInt(input);
+            const result = telData.find(item =>
+                item['分機號碼'] === telNumber ||
+                item['分機'] === telNumber ||
+                item['Tel'] === telNumber
+            );
 
-            if (results.length > 0) {
-                // 顯示第一個結果
-                const result = results[0];
+            if (result) {
                 const unit = result['使用單位'] || result['單位'] || result['部門'] || '無資料';
                 const lineGroup = result['線組編號'] || '無資料';
                 const telType = result['分機種類'] || '無資料';
@@ -425,6 +423,7 @@ DID號碼: ${didNumber}
                             <div class="result-item"><span class="label">裝機位置:</span>${installLocation}</div>
                             <div class="result-item"><span class="label">拆遷紀錄:</span>${relocationRecord}</div>
                             <div class="result-item"><span class="label">備註:</span>${remark}</div>
+                            
                         </div>
                     </body>
                     </html>
@@ -438,7 +437,7 @@ DID號碼: ${didNumber}
         function searchDispatch() {
             const input = document.getElementById('dispatchSearchInput').value.trim();
             if (input === "") {
-                alert('請輸入搜尋內容');
+                alert('請輸入調度號碼');
                 return;
             }
 
@@ -447,16 +446,18 @@ DID號碼: ${didNumber}
                 return;
             }
 
-            const results = dispatchData.filter(item => {
-                return Object.values(item).some(value => {
-                    if (value === null || value === undefined) return false;
-                    return value.toString().toLowerCase().includes(input.toLowerCase());
-                });
+            const searchNumber = input;
+            const result = dispatchData.find(item => {
+                const itemNumber = item['分機號碼']?.toString() || '';
+                const itemTel = item['Tel']?.toString() || '';
+                const itemExt = item['分機']?.toString() || '';
+                
+                return itemNumber === searchNumber || 
+                       itemTel === searchNumber || 
+                       itemExt === searchNumber;
             });
 
-            if (results.length > 0) {
-                // 顯示第一個結果
-                const result = results[0];
+            if (result) {
                 const resultWindow = window.open("", "_blank");
                 resultWindow.document.write(`
                     <!DOCTYPE html>
