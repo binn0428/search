@@ -389,7 +389,11 @@
                 if (results.length > 2) {
                     // 根據匹配欄位分類
                     const groupedResults = {};
+<<<<<<< HEAD
                     const fields = ['號碼', '單位', 'LENS', '機房端子編號', '遠端機櫃UG-50編號', '線組編號', 'DID', '裝機位置', '通話等級', '副機數量', '數位', '備註'];
+=======
+                    const fields = ['分機號碼', '使用單位', '線組編號', 'G450 Port', '分機種類', '副機數量', 'DID號碼', '裝機位置', '拆遷紀錄', '備註'];
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                     
                     results.forEach(result => {
                         fields.forEach(field => {
@@ -483,6 +487,7 @@
                                             ${items.map((result, index) => `
                                                 <div style="margin-bottom: 20px; padding: 10px; background: #fff; border-radius: 5px;">
                                                     <div class="result-item">
+<<<<<<< HEAD
                                                         <span class="label">號碼：</span>
                                                         <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
                                                     </div>
@@ -501,12 +506,21 @@
                                                     <div class="result-item">
                                                         <span class="label">遠端機櫃UG-50編號：</span>
                                                         <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '無資料', input)}</span>
+=======
+                                                        <span class="label">分機號碼：</span>
+                                                        <span class="value">${highlightText(result['分機號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
+                                                    </div>
+                                                    <div class="result-item">
+                                                        <span class="label">使用單位：</span>
+                                                        <span class="value">${highlightText(result['使用單位'] || result['單位'] || result['部門'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">線組編號：</span>
                                                         <span class="value">${highlightText(result['線組編號'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
+<<<<<<< HEAD
                                                         <span class="label">DID：</span>
                                                         <span class="value">${highlightText(result['DID'] || '無資料', input)}</span>
                                                     </div>
@@ -517,14 +531,35 @@
                                                     <div class="result-item">
                                                         <span class="label">通話等級：</span>
                                                         <span class="value">${highlightText(result['通話等級'] || '無資料', input)}</span>
+=======
+                                                        <span class="label">G450 Port：</span>
+                                                        <span class="value">${highlightText(result['G450 Port'] || '無資料', input)}</span>
+                                                    </div>
+                                                    <div class="result-item">
+                                                        <span class="label">分機種類：</span>
+                                                        <span class="value">${highlightText(result['分機種類'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">副機數量：</span>
                                                         <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                                     </div>
                                                     <div class="result-item">
+<<<<<<< HEAD
                                                         <span class="label">數位：</span>
                                                         <span class="value">${highlightText(result['數位'] || '無資料', input)}</span>
+=======
+                                                        <span class="label">DID號碼：</span>
+                                                        <span class="value">${highlightText(result['對應DID號碼'] || '無資料', input)}</span>
+                                                    </div>
+                                                    <div class="result-item">
+                                                        <span class="label">裝機位置：</span>
+                                                        <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
+                                                    </div>
+                                                    <div class="result-item">
+                                                        <span class="label">拆遷紀錄：</span>
+                                                        <span class="value">${highlightText(result['拆遷記錄'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                                     </div>
                                                     <div class="result-item">
                                                         <span class="label">備註：</span>
@@ -612,6 +647,7 @@
                                     <div class="result-card">
                                         <div class="result-header">搜尋結果 #${index + 1}</div>
                                         <div class="result-item">
+<<<<<<< HEAD
                                             <span class="label">號碼：</span>
                                             <span class="value">${highlightText(result['號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
                                         </div>
@@ -630,12 +666,21 @@
                                         <div class="result-item">
                                             <span class="label">遠端機櫃UG-50編號：</span>
                                             <span class="value">${highlightText(result['遠端機櫃UG-50編號'] || '無資料', input)}</span>
+=======
+                                            <span class="label">分機號碼：</span>
+                                            <span class="value">${highlightText(result['分機號碼'] || result['分機'] || result['Tel'] || '無資料', input)}</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="label">使用單位：</span>
+                                            <span class="value">${highlightText(result['使用單位'] || result['單位'] || result['部門'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                         </div>
                                         <div class="result-item">
                                             <span class="label">線組編號：</span>
                                             <span class="value">${highlightText(result['線組編號'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
+<<<<<<< HEAD
                                             <span class="label">DID：</span>
                                             <span class="value">${highlightText(result['DID'] || '無資料', input)}</span>
                                         </div>
@@ -646,14 +691,35 @@
                                         <div class="result-item">
                                             <span class="label">通話等級：</span>
                                             <span class="value">${highlightText(result['通話等級'] || '無資料', input)}</span>
+=======
+                                            <span class="label">G450 Port：</span>
+                                            <span class="value">${highlightText(result['G450 Port'] || '無資料', input)}</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="label">分機種類：</span>
+                                            <span class="value">${highlightText(result['分機種類'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                         </div>
                                         <div class="result-item">
                                             <span class="label">副機數量：</span>
                                             <span class="value">${highlightText(result['副機數量'] || '無資料', input)}</span>
                                         </div>
                                         <div class="result-item">
+<<<<<<< HEAD
                                             <span class="label">數位：</span>
                                             <span class="value">${highlightText(result['數位'] || '無資料', input)}</span>
+=======
+                                            <span class="label">DID號碼：</span>
+                                            <span class="value">${highlightText(result['對應DID號碼'] || '無資料', input)}</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="label">裝機位置：</span>
+                                            <span class="value">${highlightText(result['裝機位置'] || '無資料', input)}</span>
+                                        </div>
+                                        <div class="result-item">
+                                            <span class="label">拆遷紀錄：</span>
+                                            <span class="value">${highlightText(result['拆遷記錄'] || '無資料', input)}</span>
+>>>>>>> 6eab82fe23b7e955671b9bbd929ea9311e357c86
                                         </div>
                                         <div class="result-item">
                                             <span class="label">備註：</span>
